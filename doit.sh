@@ -28,10 +28,10 @@ cat d/2|xargs -n1 sh -c 'fold -w1<<<$0|sort|uniq -c|awk "/ [23] /{print \$1}"|so
 
 # Day 2.2
 #
-# The first xargs with yes|head simply duplicate every line n-times. The
+# The first xargs with yes|head simply duplicates every line n-times. The
 # xargs replaces the i-th character -- say x -- in the i-th duplicate with
 # the not-x regex ([^x]) and greps for that in the file. Prepend grep -q with
-# and echo command to see what it does. 
+# an echo command to see what it does. 
 # 
 # A nice takeaway is that parameter expansions and arithmetic expressions can
 # be nested. I use the old-style arithmetic expression syntax $[...] instead of
