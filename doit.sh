@@ -86,7 +86,7 @@ cat d/3|tr \#,:x \ |xargs -n6 sh -c 'eval echo $0 _{$2..$[$2+$4-1]}x{$3..$[$3+$5
 #
 # TODO: explanation (splitting streams with tee and joining with prefix + sort + xargs)
 #
-cat d/4|sort|tr '#:] ' \ |awk '/G/{g=$5}/l/{s=$3}/w/{print g,s,$3}'|tee >/dev/null >(awk '{print S[$1]+=$3-$2,$1}'|sort -nr|sed -n '1s/.* //p') >(awk '{print "echo "$1"_{"$2".."$3-1"}"}'|sh|sed 1i@|paste -s)|cat|LC_ALL=C sort|xargs sh -c 'grep -o $0_"[^ ]*"<<<"$@"'|awk -F_ '{print f[$0]++,$1*$2}'|sort -nr|sed -n '1s/.* //p'
+cat d/4|sort|tr '#:] ' \ |awk '/G/{g=$5}/l/{s=$3}/w/{print g,s,$3}'|tee >/dev/null >(awk '{print S[$1]+=$3-$2,$1}'|sort -nr|sed -n '1s/.* //p') >(awk '{print "echo "$1"_{"$2".."$3-1"}"}'|sh|sed 1iX|paste -s)|cat|LC_ALL=C sort|xargs sh -c 'grep -o $0_"[^ ]*"<<<"$@"'|awk -F_ '{print f[$0]++,$1*$2}'|sort -nr|sed -n '1s/.* //p'
 
 # Day 4.2
 #
