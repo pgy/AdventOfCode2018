@@ -84,17 +84,20 @@ cat d/3|tr \#,:x \ |xargs -n6 sh -c 'eval echo $0 _{$2..$[$2+$4-1]}x{$3..$[$3+$5
 
 # Day 4.1
 #
+# This solution became somewhat over-engineered (even more than the others),
+# as I wanted to solve it with opening the input file only once.
+#
 # The first part until the tee command is just preprocessing, it puts the 3
 # values to every line: (guard_id, sleep_start_minute, sleep_end_minute).
 #
-# The tee command is a hack so that I don't have to read the file twice, it
-# forks the stream into two pipelines (via the process substitutions). The
+# The tee command is a workaround so that I don't have to read the file twice,
+# it forks the stream into two pipelines (via process substitutions). The
 # redirect-with-process substitution idiom "> >(...)" is a hack to prevent
 # tee from outputing the input stream on the stdout. By default tee >(A) >(B)
 # would pipe the input to both A and B and stdout. By using tee >(A) > >(B),
-# the input is piped only to A and stdout, but stdout is redirected into B.
+# the input is piped only to A and stdout, while stdout is redirected into B.
 # This works because >(..) just creates a file descriptor with a pseudo name
-# and pastes this name into the command line.
+# and pastes this name into the command line, so I can redirect into it.
 #
 # The first pipeline in the first >(..) finds the id of the guard that slept the
 # most. The strange "sed -n 1s/..." command just takes the first line and removes
