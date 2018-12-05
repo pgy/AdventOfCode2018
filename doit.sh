@@ -84,6 +84,10 @@ cat d/3|tr \#,:x \ |xargs -n6 sh -c 'eval echo $0 _{$2..$[$2+$4-1]}x{$3..$[$3+$5
 
 # Day 4.1
 #
+# UPDATE: While this solution worked for me all the time, I don't think
+# it is guaranteed to work with every valid input, see comments at day 5.2 
+# for the problem with combining the outputs of async processes.
+#
 # This solution became somewhat over-engineered (even more than the others),
 # as I wanted to solve it with opening the input file only once.
 #
