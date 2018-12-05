@@ -123,3 +123,26 @@ cat d/4|sort|tr '#:] ' \ |awk '/G/{g=$5}/l/{s=$3}/w/{print g,s,$3}'|tee >(awk '{
 #
 cat d/4|sort|tr ':] ' \ |awk '/G/{g=$5}/l/{s=$3}/w/{print "echo \\"g"_{"s".."$3-1"}"}'|sh|tr ' _#' '\n  '|awk '{print 1+g[$1,$2]++,$1*$2}'|sort -nr|sed -n '1s/.* //p'
 
+# Day 5.1
+#
+# I learned some great sed tricks here: \u turns the next character uppercase.
+# The & references the whole matched pattern. :B creates a label called B, and
+# tB can be used to jump to this label if the previous s command succeeded.
+cat d/5|tr -d \\n|sed -r ":B;s/$(echo {a..z}|sed 's/./\0\u&|\u&\0/g'|tr -d \ )//g;tB"|wc -c
+
+# Day 5.2
+#
+# Same as before, but use eval and brace expansion to execute the solution
+# of day 5.1 multiple times with minor alteration for each letter.
+#
+# Originally I wanted to run only the sed s/{a..z}//ig in the >(..) blocks,
+# but I could not reliably combine the output of the substituted processes.
+# Output of one process always interrupted the output of another. When I
+# tried to use one long line per process, they got corruped after the length
+# was around 4200 bytes. When I used many short lines per process (1-2 bytes,
+# prefixed with source process if and sequence number, altogether 10-20 bytes)
+# they got corrupted as well. I don't think there is a reliable way to
+# combine the output of tee >(..) >(..) without using explicit pipe files and
+# cat.
+#
+cat d/5|eval $(echo tee \> '>(sed s/'{a..z}'//ig|sed -r ":B;s/$(echo {a..z}|sed "s/./\0\u&|\u&\0/g"|tr -d " ")//g;tB"|wc -c)')|sort -n|awk '{print $0-1;exit}'
