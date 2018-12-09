@@ -153,3 +153,64 @@ cat d/5|tr -d \\n|sed -r ":B;s/$(echo {a..z}|sed 's/./\0\u&|\u&\0/g'|tr -d \ )//
 # cat.
 #
 cat d/5|eval $(echo tee \> '>(sed s/'{a..z}'//ig|sed -r ":B;s/$(echo {a..z}|sed "s/./\0\u&|\u&\0/g"|tr -d " ")//g;tB"|wc -c)')|sort -n|awk '{print $0-1;exit}'
+
+# Day 6.1
+#
+# No idea. 
+#
+echo '¯\_(ツ)_/¯'
+
+# Day 6.2
+# 
+# Didn't solve 6.1, don't know what this is.
+#
+echo '¯\_(ツ)_/¯'
+
+# Day 7.1
+#
+# What we need here is a topological sort with alphabetical ordering of 
+# nodes at the same level. There are a few utilities on the command line
+# that operate on DAGs and can be used to implement topological sort.
+#
+# Here is a list of methods I tried. Unfortunately all of these failed,
+# as I could only implement regular (non-alphabetically-stable) sorting.
+#
+# Tsort based attempt (use tsort with pre-sorting):
+#
+#   cat d/7|sed 1i_|sort -k8|awk 'g!=$8{g=$8}{print "%"$2,$2"\n%"$8,$8"\n"$2,g}'|LC_ALL=C sort -u|grep ...|tr -d %|tsort|paste -sd ""
+#
+# Makefile based attempt (same, but use makefile instead of tsort, maybe
+# it keeps the nodes in alphabetical order (no)):
+#
+#   cat d/7|egrep -o ' [A-Z]'|sort -u|sed 1iall:|paste -sd ''|cat - <(cat d/7|awk '{print $8": "$2;system("touch "$8".in "$2".in")}'|sort)|sed '$a%: %.in\n\trm -f $@'|make -f -|cut -c7-|paste -sd ''
+#
+# A desperate try with find (the base idea was that the filesystem is
+# basically a DAG itself, directories would represent nodes and the
+# algorithm would move directory A into B if A depended on B):
+#
+#   mkdir {A..Z}
+#   cat d/7|cut -c6,37|sort|sed -r 's@(.)(.)@mv $(find -type d -name \2) $(find -type d -not -path "*\2*" -path "*\1*"|awk "{print length, \\$0}"|sort -n|awk "{print \\$2;exit}") @'|sh
+#
+# Some more stuff I tried:
+#
+#   - dot with rank=same
+#   - gcc -MMD -MF
+#
+# The solution that worked:
+#
+# Finally I gave up using these fancy tools and just implemented the desired
+# tsort algorithm. Probably this is the solution I like the least so far, for
+# it is single-line only on first glance; it generates and evals an iterative
+# bash script.
+#
+# The only useful thing I leared here is that the sort utility is not stable by
+# default, it needs the -s option for that.
+#
+cat d/7 | (cd $(mktemp -d) && sort -k8|awk 'g!=$8{g=$8;print "touch "$2" "$8}{print "echo "$2">>"g}'|cat - <(yes 'wc -l *|sort -ns|xargs sh -c "sed -i /\$1/d * && rm \$1 && echo \$1"'|head -n26)|sh|paste -sd '')
+
+# Day 7.2
+#
+# Things that might help (in no particular order): &, flock, mkfifo, xargs -P,
+# but I really have no idea.
+#
+echo '¯\_(ツ)_/¯'
