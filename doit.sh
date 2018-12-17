@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 # Opinionated solutions to https://adventofcode.com/2018/ challenges.
+# I skipped challenges that are not fun for some reason (too complex,
+# not interesting, I had no idea how to solve).
 # Created by Gyozo Papp. 
 
 # Day 1.1
@@ -156,7 +158,7 @@ cat d/5|eval $(echo tee \> '>(sed s/'{a..z}'//ig|sed -r ":B;s/$(echo {a..z}|sed 
 
 # Day 6.1
 #
-# No idea. 
+# No idea.
 #
 echo '¯\_(ツ)_/¯'
 
@@ -212,5 +214,49 @@ cat d/7 | (cd $(mktemp -d) && sort -k8|awk 'g!=$8{g=$8;print "touch "$2" "$8}{pr
 #
 # Things that might help (in no particular order): &, flock, mkfifo, xargs -P,
 # but I really have no idea.
+#
+echo '¯\_(ツ)_/¯'
+
+# Day 8: this is too recursive to be fun
+# Day 9: the rules are too arbitrary
+# Day 10: no idea (maybe check for straight lines and then do gocr?)
+#
+yes '¯\_(ツ)_/¯' | head -6
+
+# Day 11
+
+# Day 12.1
+#
+# The simulation is done by the sed script, everything else is to calculate the
+# numberic result.
+# 
+# Lets break it down:
+#   1!d;        Delete the first line.
+#   y/./_/;     Replace . with _, as . has special meaning in regex.
+#   :O;         Create a label called (O)uterLoop.
+#   p;          Print the line.
+#   s/^/:____/; Insert some dead plants to the beginning for "infinit" space.
+#               This command also insert a cursor value ":" to the beginning.
+#               As the algorithm processes the string, I want this cursor to
+#               separate the already processed and unprocessed parts.
+#   s/$/____/;  Insert some dead plants to the end for "infinit" space.
+#   :I;         Create a label called (I)nnerLoop
+#   $(...);     Generate "s" sed commands for every rule. These commands do
+#               the actual replacements and advance the cursor.
+#   tI;         Repeat from I, if one of the generated commands succeeded.
+#   s/://;      The cursor is at the end, no more replacements, repeat from O.
+#
+# Because I append 4 dead plants to the beginning in every iteration, the
+# position of the first visible pot at iteration i can be calculated by this
+# function: -(4-2)*i. So after the 20th iteration, the address of the first 
+# visible pot is -40.
+#
+cat d/12|sed -nr '1!d;y/./_/;s/.*: //;:O;p;s/^/:____/;s/$/____/;:I;'"$(cat d/12|sed -rn 'y/./_/;/=/s/(.)(....) => (.)/s@:\1\2@\3:\2@/p')"';tI;s/://;bO'|head -21|tail -n1|fold -w1|paste - <(seq -40 300)|awk '/#/{s+=$2}END{print s}'
+
+# Day 12.2
+#
+# Actually, after a few generations, the flowers will remain the same, they
+# will only move rightward by 1 pot / generation speed. This is not fun to
+# calculate in bash.
 #
 echo '¯\_(ツ)_/¯'
